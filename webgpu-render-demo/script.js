@@ -5,8 +5,8 @@ const clearColor = { r: 0.0, g: 0.5, b: 1.0, a: 1.0 };
 // Each vertex has 8 values representing position and color: X Y Z W R G B A
 
 const vertices = new Float32Array([
-  0.0,  0.6, 0, 1, 1, 0, 0, 1,
- -0.5, -0.6, 0, 1, 0, 1, 0, 1,
+  0.0, 0.6, 0, 1, 1, 0, 0, 1,
+  -0.5, -0.6, 0, 1, 0, 1, 0, 1,
   0.5, -0.6, 0, 1, 0, 0, 1, 1
 ]);
 
@@ -49,6 +49,10 @@ async function init() {
   }
 
   let device = await adapter.requestDevice();
+  device.addEventListener("uncapturederror", (event) => {
+    // Re-surface the error.
+    console.error("A WebGPU error was not captured:", event.error);
+  });
 
   // 2: Create a shader module from the shaders template literal
   const shaderModule = device.createShaderModule({
@@ -111,7 +115,7 @@ async function init() {
   // 6: Create the actual render pipeline
 
   const renderPipeline = device.createRenderPipeline(pipelineDescriptor);
-    
+
   // 7: Create GPUCommandEncoder to issue commands to the GPU
   // Note: render pass descriptor, command encoder, etc. are destroyed after use, fresh one needed for each frame.
   const commandEncoder = device.createCommandEncoder();
@@ -128,7 +132,7 @@ async function init() {
   };
 
   const passEncoder = commandEncoder.beginRenderPass(renderPassDescriptor);
-    
+
   // 9: Draw the triangle
 
   passEncoder.setPipeline(renderPipeline);
